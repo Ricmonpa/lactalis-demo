@@ -4,30 +4,45 @@ import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// CONFIGURACIÓN DE METADATOS PARA FORZAR EL PLAY EN WHATSAPP
 export const metadata: Metadata = {
   title: 'Lactalis Academy - Capacitación',
-  description: 'Completa tu lección diaria y gana puntos.',
+  description: 'Mira el video y suma tus primeros 50 puntos.',
   openGraph: {
-    title: 'Lactalis Academy - Lección 1',
-    description: 'Mira el video de bienvenida y suma Lactalises.',
+    title: 'Lactalis Academy - Bienvenida',
+    description: 'Video de inducción para nuevos colaboradores.',
     url: 'https://lactalis-demo.vercel.app/demo',
     siteName: 'Lactalis México',
-    type: 'video.other', // Esto ayuda a WhatsApp a entender que hay un video
+    type: 'video.other', 
     images: [
       {
         url: 'https://lactalis-demo.vercel.app/thumbnail-demo.png',
         width: 800,
         height: 600,
-        alt: 'Lactalis Academy Preview',
       },
     ],
-    // Intentamos forzar el player de video en el preview
     videos: [
       {
         url: 'https://lactalis-demo.vercel.app/videos/bienvenida.mp4',
+        secureUrl: 'https://lactalis-demo.vercel.app/videos/bienvenida.mp4',
+        type: 'video/mp4',
         width: 1080,
         height: 1920,
-        type: 'video/mp4',
+      },
+    ],
+  },
+  // ESTO ES LO QUE SUELE ACTIVAR EL BOTÓN EN IPHONE/WHATSAPP
+  twitter: {
+    card: 'player',
+    title: 'Lactalis Academy - Bienvenida',
+    description: 'Video de inducción para nuevos colaboradores.',
+    images: ['https://lactalis-demo.vercel.app/thumbnail-demo.png'],
+    players: [
+      {
+        playerUrl: 'https://lactalis-demo.vercel.app/demo',
+        streamUrl: 'https://lactalis-demo.vercel.app/videos/bienvenida.mp4',
+        width: 1080,
+        height: 1920,
       },
     ],
   },
@@ -36,16 +51,15 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.Node;
 }) {
   return (
     <html lang="es">
       <head>
-        {/* Este meta asegura que en móviles el sitio no se vea chiquito y use bien el espacio */}
-        <meta 
-          name="viewport" 
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" 
-        />
+        {/* Forzamos que WhatsApp no ignore el video */}
+        <meta property="og:video:type" content="video/mp4" />
+        <meta property="og:video:width" content="1080" />
+        <meta property="og:video:height" content="1920" />
       </head>
       <body className={inter.className}>
         {children}

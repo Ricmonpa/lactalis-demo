@@ -1,4 +1,8 @@
+import './globals.css' // <--- ESTO ES LO QUE CARGA TUS ESTILOS BONITOS
 import { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Lactalis Academy - Capacitación',
@@ -10,7 +14,7 @@ export const metadata: Metadata = {
     siteName: 'Lactalis México',
     images: [
       {
-        url: 'https://lactalis-demo.vercel.app/thumbnail-demo.png', // RECUERDA: Sube esta imagen a tu carpeta /public
+        url: 'https://lactalis-demo.vercel.app/thumbnail-demo.png',
         width: 800,
         height: 600,
         alt: 'Lactalis Academy Preview',
@@ -20,10 +24,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function DemoLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  return (
+    <html lang="es">
+      <body className={inter.className}>
+        {children}
+      </body>
+    </html>
+  )
 }

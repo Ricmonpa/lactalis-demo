@@ -1,26 +1,25 @@
 @import "tailwindcss";
 
+/* Forzamos el fondo gris claro que se ve pro en apps móviles */
 :root {
-  --background: #ffffff;
+  --background: #f3f4f6; /* Este es el gray-100 que usábamos */
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Quitamos el soporte de modo oscuro automático para que en el cel del cliente */
+/* siempre se vea con los colores de Lactalis (blanco y azul) */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Esto asegura que Tailwind aplique bien las capas */
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
 }

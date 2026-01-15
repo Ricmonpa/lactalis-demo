@@ -76,8 +76,8 @@ export default function DemoPage() {
               className="w-full h-full object-cover"
               controls
               playsInline
-              // Asegúrate de que este video exista en /public/videos/bienvenida.mp4
-              src="/videos/bienvenida.mp4" 
+              // Video de Kraft Singles
+              src="/videos/Kraft_Singles_Commercial_Script.mp4" 
               poster="/thumbnail-demo.png"
               onEnded={handleVideoEnd}
             />

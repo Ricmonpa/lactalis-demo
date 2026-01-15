@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function YouTubeSetupPage() {
+// Componente que usa useSearchParams (debe estar envuelto en Suspense)
+function YouTubeSetupContent() {
   const searchParams = useSearchParams();
   const [tokenData, setTokenData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if we have token data in URL params (from callback redirect)
     const tokenParam = searchParams.get('token');
     if (tokenParam) {
       try {
@@ -132,7 +132,7 @@ export default function YouTubeSetupPage() {
                   >
                     APIs & Services → OAuth consent screen
                   </a>
-                  . Selecciona "External" y completa la información básica
+                  . Selecciona &quot;External&quot; y completa la información básica
                 </p>
               </div>
             </li>
@@ -155,7 +155,7 @@ export default function YouTubeSetupPage() {
                   >
                     APIs & Services → Credentials
                   </a>
-                  . Crea credenciales OAuth 2.0 Client ID. Tipo: "Web application". 
+                  . Crea credenciales OAuth 2.0 Client ID. Tipo: &quot;Web application&quot;. 
                   Agrega URI de redirección: <code className="bg-gray-100 px-1 rounded text-xs">{process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/youtube/callback</code>
                 </p>
               </div>
@@ -321,3 +321,23 @@ export default function YouTubeSetupPage() {
   );
 }
 
+// Loading fallback
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Cargando configuración...</p>
+      </div>
+    </div>
+  );
+}
+
+// Componente principal con Suspense
+export default function YouTubeSetupPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <YouTubeSetupContent />
+    </Suspense>
+  );
+}

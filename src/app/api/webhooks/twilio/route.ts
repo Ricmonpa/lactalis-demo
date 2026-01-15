@@ -74,22 +74,51 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // No hay sesión activa - mensaje genérico o ignorar
-    console.log(`[Twilio Webhook] No active quiz session for ${cleanPhone}, ignoring message`);
+    // No hay sesión activa - verificar comandos
+    console.log(`[Twilio Webhook] No active quiz session for ${cleanPhone}`);
     
-    // Opcional: Enviar mensaje de ayuda si el usuario envía comandos específicos
     const upperBody = body.toUpperCase().trim();
+    const { sendWhatsAppMessage } = await import('@/lib/whatsapp/provider');
+    
+    // Comando QUIZ - iniciar quiz directamente
+    if (upperBody === 'QUIZ') {
+      console.log(`[Twilio Webhook] User ${cleanPhone} requested quiz`);
+      
+      // Buscar el quiz del demo
+      const quiz = await prisma.quiz.findFirst({
+        where: { isActive: true },
+        orderBy: { createdAt: 'desc' },
+      });
+      
+      if (quiz) {
+        const { sendConversationalQuiz } = await import('@/lib/whatsapp/send-conversational-quiz');
+        await sendConversationalQuiz({
+          userPhone: cleanPhone,
+          quizId: quiz.id,
+        });
+        return NextResponse.json({ 
+          success: true,
+          message: 'Quiz started',
+        });
+      } else {
+        await sendWhatsAppMessage({
+          to: cleanPhone,
+          body: '⚠️ No hay quizzes disponibles en este momento.',
+        });
+      }
+    }
+    
+    // Comando HELP/AYUDA
     if (upperBody === 'HELP' || upperBody === 'AYUDA') {
-      const { sendWhatsAppMessage } = await import('@/lib/whatsapp/provider');
       await sendWhatsAppMessage({
         to: cleanPhone,
-        body: '👋 Hola! Para comenzar un quiz, primero debes ver un video de capacitación. Espera a recibir el enlace del video.',
+        body: '👋 Hola! Comandos disponibles:\n\n• QUIZ - Iniciar el quiz\n• AYUDA - Ver este mensaje',
       });
     }
 
     return NextResponse.json({ 
       success: true,
-      message: 'Webhook received (no active quiz session)',
+      message: 'Webhook received',
     });
   } catch (error: any) {
     console.error('[Twilio Webhook] Error:', error);

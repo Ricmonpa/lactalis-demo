@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  phone         String    @unique
+  name          String?
+  email         String?
+  lCoins        Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  progress      UserProgress[]
+  quizAttempts  QuizAttempt[]
+  transactions  WalletTransaction[]
+  quizSessions  QuizSession[]
+}
+
+model Content {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  type        String      // "video", "quiz", etc.
+  order       Int         @default(0)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  videoAsset  VideoAsset?
+  quiz        Quiz?
+  progress    UserProgress[]
+}
+
+model VideoAsset {
+  id                String    @id @default(cuid())
+  contentId         String    @unique
+  content           Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  
+  // Mux fields
+  muxAssetId        String?   @unique
+  muxPlaybackId     String?   @unique
+  muxStatus         String    @default("pending") // "pending", "ready", "errored"
+  muxUrl            String?
+  
+  // YouTube fields
+  youtubeVideoId    String?   @unique
+  youtubeUrl        String?
+  youtubeStatus     String    @default("pending") // "pending", "uploaded", "error"
+  youtubeViewCount  Int       @default(0)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Quiz {
+  id              String        @id @default(cuid())
+  contentId       String        @unique
+  content         Content       @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  passingScore    Int           @default(70) // Percentage
+  rewardCoins     Int           @default(50)
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  questions       Question[]
+  attempts        QuizAttempt[]
+  sessions        QuizSession[]
+}
+
+model Question {
+  id              String    @id @default(cuid())
+  quizId          String
+  quiz            Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  questionText    String
+  type            String    @default("MULTIPLE_CHOICE") // "MULTIPLE_CHOICE", "TRUE_FALSE", etc.
+  options         String[]  // Array of options
+  correctAnswer   Int       // Index of correct answer
+  order           Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([quizId])
+}
+
+model QuizAttempt {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId          String
+  quiz            Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score           Int       // Percentage score
+  passed          Boolean
+  answers         Json      // Store user's answers
+  completedAt     DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([quizId])
+}
+
+model UserProgress {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId       String
+  content         Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  completed       Boolean   @default(false)
+  watchedDuration Int?      // Seconds watched
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([userId, contentId])
+  @@index([userId])
+}
+
+model WalletTransaction {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount          Int       // Can be positive (earned) or negative (spent)
+  type            String    // "quiz_reward", "purchase", "bonus", etc.
+  description     String?
+  contentId       String?
+  quizAttemptId   String?
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+}
+
+model QuizSession {
+  id                  String    @id @default(cuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId              String
+  quiz                Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  currentQuestionIndex Int      @default(0)
+  answers             Json      @default("{}") // { "0": "1", "1": "2", ... }
+  status              String    @default("active") // active | completed
+  startedAt           DateTime  @default(now())
+  completedAt         DateTime?
+  
+  @@index([userId, status])
+  @@index([quizId])
+}
+

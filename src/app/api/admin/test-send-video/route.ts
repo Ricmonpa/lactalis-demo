@@ -6,7 +6,8 @@ import { prisma } from '@/lib/prisma';
  * Lógica común para enviar video de prueba
  */
 async function handleSendVideo(userPhone: string, contentId: string) {
-  console.log(`[Test Send Video] Starting test for ${userPhone}, contentId: ${contentId}`);
+  try {
+    console.log(`[Test Send Video] Starting test for ${userPhone}, contentId: ${contentId}`);
 
     // Verificar que el contenido existe
     const content = await prisma.content.findUnique({

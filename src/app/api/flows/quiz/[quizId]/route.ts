@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { quizId: string } }
+  { params }: { params: Promise<{ quizId: string }> }
 ) {
   try {
-    const { quizId } = params;
+    const { quizId } = await params;
 
     console.log(`[Quiz Flow API] Generating Flow JSON for quizId: ${quizId}`);
 

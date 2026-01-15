@@ -3,25 +3,10 @@ import { sendVideo } from '@/lib/whatsapp/send-video';
 import { prisma } from '@/lib/prisma';
 
 /**
- * Endpoint para probar el envío completo del video y flujo de quiz
- * POST /api/admin/test-send-video
- * 
- * Body (opcional):
- * {
- *   "userPhone": "+5214774046609",  // Opcional, usa DEMO_TEST_PHONE del .env
- *   "contentId": "demo-content-1"   // Opcional, usa el demo por defecto
- * }
- * 
- * GET /api/admin/test-send-video
- * Envía el video usando valores por defecto
+ * Lógica común para enviar video de prueba
  */
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json().catch(() => ({}));
-    const userPhone = body.userPhone || process.env.DEMO_TEST_PHONE || '+5214774046609';
-    const contentId = body.contentId || 'demo-content-1';
-
-    console.log(`[Test Send Video] Starting test for ${userPhone}, contentId: ${contentId}`);
+async function handleSendVideo(userPhone: string, contentId: string) {
+  console.log(`[Test Send Video] Starting test for ${userPhone}, contentId: ${contentId}`);
 
     // Verificar que el contenido existe
     const content = await prisma.content.findUnique({
@@ -157,33 +142,23 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET endpoint - Envía el video usando valores por defecto
+ * POST /api/admin/test-send-video
+ * Body (opcional): { "userPhone": "+52...", "contentId": "demo-content-1" }
+ */
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => ({}));
+  const userPhone = body.userPhone || process.env.DEMO_TEST_PHONE || '+5214774046609';
+  const contentId = body.contentId || 'demo-content-1';
+  return handleSendVideo(userPhone, contentId);
+}
+
+/**
+ * GET /api/admin/test-send-video?phone=+52...&contentId=demo-content-1
  */
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const userPhone = searchParams.get('phone') || process.env.DEMO_TEST_PHONE || '+5214774046609';
-    const contentId = searchParams.get('contentId') || 'demo-content-1';
-
-    // Usar el mismo código del POST
-    const response = await POST(
-      new Request(request.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userPhone, contentId }),
-      })
-    );
-
-    return response;
-  } catch (error: any) {
-    console.error('[Test Send Video] Error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message || 'Failed to send test video',
-      },
-      { status: 500 }
-    );
-  }
+  const { searchParams } = new URL(request.url);
+  const userPhone = searchParams.get('phone') || process.env.DEMO_TEST_PHONE || '+5214774046609';
+  const contentId = searchParams.get('contentId') || 'demo-content-1';
+  return handleSendVideo(userPhone, contentId);
 }
 

@@ -70,14 +70,14 @@ export default function DemoPage() {
             <p className="text-xs text-blue-200">Kraft Singles vs Imitaciones</p>
           </div>
           
-          <div className="relative aspect-[9/16] bg-black">
+          <div className="relative bg-black flex items-center justify-center min-h-[400px] max-h-[80vh]">
             <video 
               ref={videoRef}
-              className="w-full h-full object-cover"
+              className="w-full h-auto max-w-full max-h-[80vh] object-contain"
               controls
               playsInline
-              // Video de Kraft Singles
-              src="/videos/Kraft_Singles_Commercial_Script.mp4" 
+              // Video de Kraft Singles - Se adapta a cualquier aspect ratio
+              src="/videos/Kraft_Singles_Commercial_Script.mp4"
               poster="/thumbnail-demo.png"
               onEnded={handleVideoEnd}
             />

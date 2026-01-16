@@ -78,7 +78,7 @@ export default function DemoPage() {
               playsInline
               // Video de Kraft Singles - Se adapta a cualquier aspect ratio
               src="/videos/Kraft_Singles_Commercial_Script.mp4"
-              poster="/thumbnail-demo.png"
+              poster="/videos/kraft-singles-thumbnail.jpg"
               onEnded={handleVideoEnd}
             />
             {/* Botón trampa para saltar el video en la demo si es muy largo */}

@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     type: 'video.other', 
     images: [
       {
-        url: 'https://lactalis-demo.vercel.app/videos/poster2.png',
-        width: 1920,
-        height: 1080,
+        url: 'https://lactalis-demo.vercel.app/poster2.png',
+        width: 1200,
+        height: 630,
         alt: 'Kraft Singles - Video de Capacitación',
       },
     ],
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'player',
     title: 'Lactalis Academy - Kraft Singles',
     description: 'Aprende sobre los ingredientes y beneficios de Kraft Singles.',
-    images: ['https://lactalis-demo.vercel.app/videos/poster2.png'],
+    images: ['https://lactalis-demo.vercel.app/poster2.png'],
     players: [
       {
         playerUrl: 'https://lactalis-demo.vercel.app/',
@@ -57,11 +57,29 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
-        {/* Forzamos que WhatsApp no ignore el video */}
+        {/* Meta tags específicos para WhatsApp */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://lactalis-demo.vercel.app/" />
+        <meta property="og:title" content="Lactalis Academy - Kraft Singles" />
+        <meta property="og:description" content="Aprende sobre los ingredientes y beneficios de Kraft Singles. Descubre por qué es queso de verdad con calcio." />
+        <meta property="og:image" content="https://lactalis-demo.vercel.app/poster2.png" />
+        <meta property="og:image:secure_url" content="https://lactalis-demo.vercel.app/poster2.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Kraft Singles - Video de Capacitación" />
+        <meta property="og:site_name" content="Lactalis México" />
+        
+        {/* Video meta tags */}
+        <meta property="og:video" content="https://lactalis-demo.vercel.app/videos/Kraft_Singles_Commercial_Script.mp4" />
+        <meta property="og:video:secure_url" content="https://lactalis-demo.vercel.app/videos/Kraft_Singles_Commercial_Script.mp4" />
         <meta property="og:video:type" content="video/mp4" />
         <meta property="og:video:width" content="1920" />
         <meta property="og:video:height" content="1080" />
-        <meta property="og:image" content="https://lactalis-demo.vercel.app/videos/poster2.png" />
+        
+        {/* WhatsApp específico */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content="https://lactalis-demo.vercel.app/poster2.png" />
       </head>
       <body className={inter.className}>
         {children}

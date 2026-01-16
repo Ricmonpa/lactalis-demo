@@ -79,7 +79,7 @@ export default function DemoPage() {
               preload="metadata"
               // Video de Kraft Singles - Se adapta a cualquier aspect ratio
               src="/videos/Kraft_Singles_Commercial_Script.mp4"
-              poster="/videos/kraft-singles-thumbnail.jpg"
+              poster="/videos/poster2.png"
               onEnded={handleVideoEnd}
               onError={(e) => {
                 console.error('Error loading video:', e);

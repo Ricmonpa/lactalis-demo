@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: 'video.other', 
     images: [
       {
-        url: 'https://lactalis-demo.vercel.app/videos/kraft-singles-thumbnail.jpg',
+        url: 'https://lactalis-demo.vercel.app/videos/poster2.png',
         width: 1920,
         height: 1080,
         alt: 'Kraft Singles - Video de Capacitación',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'player',
     title: 'Lactalis Academy - Kraft Singles',
     description: 'Aprende sobre los ingredientes y beneficios de Kraft Singles.',
-    images: ['https://lactalis-demo.vercel.app/videos/kraft-singles-thumbnail.jpg'],
+    images: ['https://lactalis-demo.vercel.app/videos/poster2.png'],
     players: [
       {
         playerUrl: 'https://lactalis-demo.vercel.app/',
@@ -61,7 +61,7 @@ export default function RootLayout({
         <meta property="og:video:type" content="video/mp4" />
         <meta property="og:video:width" content="1920" />
         <meta property="og:video:height" content="1080" />
-        <meta property="og:image" content="https://lactalis-demo.vercel.app/videos/kraft-singles-thumbnail.jpg" />
+        <meta property="og:image" content="https://lactalis-demo.vercel.app/videos/poster2.png" />
       </head>
       <body className={inter.className}>
         {children}

@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: 'https://lactalis-demo.vercel.app/poster2.png',
-        width: 1200,
-        height: 630,
+        width: 838,
+        height: 810,
         alt: 'Kraft Singles - Video de Capacitación',
       },
     ],
@@ -65,8 +65,8 @@ export default function RootLayout({
         <meta property="og:image" content="https://lactalis-demo.vercel.app/poster2.png" />
         <meta property="og:image:secure_url" content="https://lactalis-demo.vercel.app/poster2.png" />
         <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
+        <meta property="og:image:width" content="838" />
+        <meta property="og:image:height" content="810" />
         <meta property="og:image:alt" content="Kraft Singles - Video de Capacitación" />
         <meta property="og:site_name" content="Lactalis México" />
         

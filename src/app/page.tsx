@@ -76,11 +76,18 @@ export default function DemoPage() {
               className="w-full h-auto max-w-full max-h-[80vh] object-contain"
               controls
               playsInline
+              preload="metadata"
               // Video de Kraft Singles - Se adapta a cualquier aspect ratio
               src="/videos/Kraft_Singles_Commercial_Script.mp4"
               poster="/videos/kraft-singles-thumbnail.jpg"
               onEnded={handleVideoEnd}
-            />
+              onError={(e) => {
+                console.error('Error loading video:', e);
+                alert('Error al cargar el video. Por favor, recarga la página.');
+              }}
+            >
+              Tu navegador no soporta la reproducción de video.
+            </video>
             {/* Botón trampa para saltar el video en la demo si es muy largo */}
             <button 
               onClick={handleVideoEnd}

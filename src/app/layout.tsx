@@ -9,40 +9,41 @@ export const metadata: Metadata = {
   title: 'Lactalis Academy - Capacitación',
   description: 'Mira el video y suma tus primeros 50 puntos.',
   openGraph: {
-    title: 'Lactalis Academy - Bienvenida',
-    description: 'Video de inducción para nuevos colaboradores.',
-    url: 'https://lactalis-demo.vercel.app/demo',
+    title: 'Lactalis Academy - Kraft Singles',
+    description: 'Aprende sobre los ingredientes y beneficios de Kraft Singles.',
+    url: 'https://lactalis-demo.vercel.app/',
     siteName: 'Lactalis México',
     type: 'video.other', 
     images: [
       {
-        url: 'https://lactalis-demo.vercel.app/thumbnail-demo.png',
-        width: 800,
-        height: 600,
+        url: 'https://lactalis-demo.vercel.app/videos/kraft-singles-thumbnail.jpg',
+        width: 1920,
+        height: 1080,
+        alt: 'Kraft Singles - Video de Capacitación',
       },
     ],
     videos: [
       {
-        url: 'https://lactalis-demo.vercel.app/videos/bienvenida.mp4',
-        secureUrl: 'https://lactalis-demo.vercel.app/videos/bienvenida.mp4',
+        url: 'https://lactalis-demo.vercel.app/videos/Kraft_Singles_Commercial_Script.mp4',
+        secureUrl: 'https://lactalis-demo.vercel.app/videos/Kraft_Singles_Commercial_Script.mp4',
         type: 'video/mp4',
-        width: 1080,
-        height: 1920,
+        width: 1920,
+        height: 1080,
       },
     ],
   },
   // ESTO ES LO QUE SUELE ACTIVAR EL BOTÓN EN IPHONE/WHATSAPP
   twitter: {
     card: 'player',
-    title: 'Lactalis Academy - Bienvenida',
-    description: 'Video de inducción para nuevos colaboradores.',
-    images: ['https://lactalis-demo.vercel.app/thumbnail-demo.png'],
+    title: 'Lactalis Academy - Kraft Singles',
+    description: 'Aprende sobre los ingredientes y beneficios de Kraft Singles.',
+    images: ['https://lactalis-demo.vercel.app/videos/kraft-singles-thumbnail.jpg'],
     players: [
       {
-        playerUrl: 'https://lactalis-demo.vercel.app/demo',
-        streamUrl: 'https://lactalis-demo.vercel.app/videos/bienvenida.mp4',
-        width: 1080,
-        height: 1920,
+        playerUrl: 'https://lactalis-demo.vercel.app/',
+        streamUrl: 'https://lactalis-demo.vercel.app/videos/Kraft_Singles_Commercial_Script.mp4',
+        width: 1920,
+        height: 1080,
       },
     ],
   },
@@ -58,8 +59,9 @@ export default function RootLayout({
       <head>
         {/* Forzamos que WhatsApp no ignore el video */}
         <meta property="og:video:type" content="video/mp4" />
-        <meta property="og:video:width" content="1080" />
-        <meta property="og:video:height" content="1920" />
+        <meta property="og:video:width" content="1920" />
+        <meta property="og:video:height" content="1080" />
+        <meta property="og:image" content="https://lactalis-demo.vercel.app/videos/kraft-singles-thumbnail.jpg" />
       </head>
       <body className={inter.className}>
         {children}

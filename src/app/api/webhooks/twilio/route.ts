@@ -1,142 +1,128 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processQuizAnswer } from '@/lib/whatsapp/send-conversational-quiz';
+import { sendWhatsAppMessage } from '@/lib/whatsapp/provider';
 
+/**
+ * Feedback para el Quiz de Kraft Singles (nativo en WhatsApp)
+ */
+const KRAFT_QUIZ_FEEDBACK = {
+  correct: `✅ *¡Exacto!*
+
+Eso vende nutrición y calidad. Cuando hablas de beneficios reales, las mamás confían más.
+
+🎉 *¡Ganaste +50 Lactalises!*
+
+Sigue aprendiendo para ganar más puntos. 💪`,
+
+  incorrect: `❌ Estuviste cerca, pero el precio atrae y la nutrición convence.
+
+💡 La respuesta correcta es B: Hablar de los beneficios reales (calcio, proteína, leche de vaca) es más convincente que solo mencionar el sabor.
+
+Escribe *B* para continuar.`,
+
+  invalid: `⚠️ Opción no válida.
+
+Por favor, escribe *A* o *B* para responder.`,
+};
+
+/**
+ * POST /api/webhooks/twilio
+ * Recibe mensajes de WhatsApp via Twilio y responde al quiz
+ */
 export async function POST(request: NextRequest) {
   try {
     // Twilio envía datos como x-www-form-urlencoded
     const formData = await request.formData();
     
-    // Parsear los datos del webhook de Twilio
     const body = formData.get('Body') as string | null;
     const from = formData.get('From') as string | null;
-    const to = formData.get('To') as string | null;
-    const messageSid = formData.get('MessageSid') as string | null;
-    const accountSid = formData.get('AccountSid') as string | null;
-    const numMedia = formData.get('NumMedia') as string | null;
 
-    console.log('[Twilio Webhook] Received message:');
+    console.log('[Twilio Webhook] Mensaje recibido:');
     console.log('  From:', from);
-    console.log('  To:', to);
     console.log('  Body:', body);
-    console.log('  MessageSid:', messageSid);
-    console.log('  AccountSid:', accountSid);
-    console.log('  NumMedia:', numMedia);
 
     // Limpiar el número de teléfono (remover prefijo whatsapp:)
-    const cleanPhone = from?.replace('whatsapp:', '') || from;
+    const cleanPhone = from?.replace('whatsapp:', '') || '';
 
     if (!cleanPhone || !body) {
-      return NextResponse.json({ 
-        success: false,
-        error: 'Missing from or body'
-      }, { status: 400 });
+      console.log('[Twilio Webhook] Mensaje vacío o sin remitente');
+      return NextResponse.json({ success: true });
     }
 
-    // Registrar en consola
-    console.log(`[Twilio Webhook] User ${cleanPhone} sent: "${body}"`);
+    // Normalizar el texto (lowercase, trim)
+    const normalizedBody = body.toLowerCase().trim();
 
-    // Verificar si hay una sesión de quiz activa
-    const { prisma } = await import('@/lib/prisma');
+    console.log(`[Twilio Webhook] Usuario ${cleanPhone} envió: "${normalizedBody}"`);
+
+    let responseMessage: string;
+
+    // Lógica del Quiz Kraft Singles
+    if (normalizedBody === 'b') {
+      // Respuesta CORRECTA
+      console.log(`[Twilio Webhook] ✅ Respuesta correcta de ${cleanPhone}`);
+      responseMessage = KRAFT_QUIZ_FEEDBACK.correct;
+    } else if (normalizedBody === 'a') {
+      // Respuesta INCORRECTA
+      console.log(`[Twilio Webhook] ❌ Respuesta incorrecta de ${cleanPhone}`);
+      responseMessage = KRAFT_QUIZ_FEEDBACK.incorrect;
+    } else if (normalizedBody === 'quiz' || normalizedBody === 'demo') {
+      // Comando para iniciar el demo
+      console.log(`[Twilio Webhook] Usuario solicitó demo`);
+      responseMessage = `👋 ¡Hola! Para recibir la lección de Kraft Singles, visita:
+
+https://lactalis-demo.vercel.app/admin/demo
+
+O pide al administrador que te envíe la lección.`;
+    } else if (normalizedBody === 'ayuda' || normalizedBody === 'help') {
+      // Comando de ayuda
+      responseMessage = `👋 *Lactalis Flow - Ayuda*
+
+Comandos disponibles:
+• *A* o *B* - Responder al quiz
+• *QUIZ* - Solicitar un quiz
+• *AYUDA* - Ver este mensaje
+
+Si tienes un quiz activo, responde con A o B.`;
+    } else {
+      // Cualquier otra cosa
+      console.log(`[Twilio Webhook] Respuesta no válida de ${cleanPhone}: "${normalizedBody}"`);
+      responseMessage = KRAFT_QUIZ_FEEDBACK.invalid;
+    }
+
+    // Enviar respuesta
+    console.log(`[Twilio Webhook] Enviando respuesta a ${cleanPhone}`);
     
-    const user = await prisma.user.findUnique({
-      where: { phone: cleanPhone },
+    const result = await sendWhatsAppMessage({
+      to: cleanPhone,
+      body: responseMessage,
     });
 
-    if (user) {
-      const activeSession = await prisma.quizSession.findFirst({
-        where: {
-          userId: user.id,
-          status: 'active',
-        },
-        orderBy: {
-          startedAt: 'desc',
-        },
-      });
-
-      if (activeSession) {
-        // Hay una sesión activa - procesar respuesta del quiz
-        console.log(`[Twilio Webhook] Processing quiz answer for session ${activeSession.id}`);
-        
-        const result = await processQuizAnswer({
-          userPhone: cleanPhone,
-          answer: body,
-        });
-
-        if (result.completed) {
-          console.log(`[Twilio Webhook] Quiz completed for ${cleanPhone}`);
-        }
-
-        return NextResponse.json({ 
-          success: true,
-          message: 'Quiz answer processed',
-          completed: result.completed,
-        });
-      }
-    }
-
-    // No hay sesión activa - verificar comandos
-    console.log(`[Twilio Webhook] No active quiz session for ${cleanPhone}`);
-    
-    const upperBody = body.toUpperCase().trim();
-    const { sendWhatsAppMessage } = await import('@/lib/whatsapp/provider');
-    
-    // Comando QUIZ - iniciar quiz directamente
-    if (upperBody === 'QUIZ') {
-      console.log(`[Twilio Webhook] User ${cleanPhone} requested quiz`);
-      
-      // Buscar el quiz del demo
-      const quiz = await prisma.quiz.findFirst({
-        where: { isActive: true },
-        orderBy: { createdAt: 'desc' },
-      });
-      
-      if (quiz) {
-        const { sendConversationalQuiz } = await import('@/lib/whatsapp/send-conversational-quiz');
-        await sendConversationalQuiz({
-          userPhone: cleanPhone,
-          quizId: quiz.id,
-        });
-        return NextResponse.json({ 
-          success: true,
-          message: 'Quiz started',
-        });
-      } else {
-        await sendWhatsAppMessage({
-          to: cleanPhone,
-          body: '⚠️ No hay quizzes disponibles en este momento.',
-        });
-      }
-    }
-    
-    // Comando HELP/AYUDA
-    if (upperBody === 'HELP' || upperBody === 'AYUDA') {
-      await sendWhatsAppMessage({
-        to: cleanPhone,
-        body: '👋 Hola! Comandos disponibles:\n\n• QUIZ - Iniciar el quiz\n• AYUDA - Ver este mensaje',
-      });
+    if (!result.success) {
+      console.error(`[Twilio Webhook] Error al enviar respuesta:`, result.error);
+    } else {
+      console.log(`[Twilio Webhook] ✅ Respuesta enviada a ${cleanPhone}`);
     }
 
     return NextResponse.json({ 
       success: true,
-      message: 'Webhook received',
+      message: 'Webhook processed',
     });
   } catch (error: any) {
     console.error('[Twilio Webhook] Error:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to process webhook',
-        message: error.message || 'Unknown error'
-      },
+      { error: 'Failed to process webhook', message: error.message },
       { status: 500 }
     );
   }
 }
 
-// Twilio también puede hacer GET para verificar el webhook
-export async function GET(request: NextRequest) {
+/**
+ * GET /api/webhooks/twilio
+ * Verificación del webhook
+ */
+export async function GET() {
   return NextResponse.json({ 
     status: 'ok',
-    message: 'Twilio webhook endpoint is active'
+    message: 'Twilio webhook endpoint is active',
+    quiz: 'Kraft Singles Quiz - Responde A o B',
   });
 }
-

@@ -19,8 +19,8 @@ Kraft Singles es queso americano REAL, hecho con leche de vaca.
 
 👇 Mira este video corto:`,
 
-  // URL del video
-  videoUrl: 'https://lactalis-demo.vercel.app/videos/Kraft_Singles_Commercial_Script.mp4',
+  // URL del video - Video de YouTube
+  videoUrl: 'https://youtu.be/8_xNUqWLrXs',
 
   // Mensaje del quiz (se envía después del video)
   quizMessage: `📝 *QUIZ RÁPIDO*

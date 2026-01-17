@@ -8,7 +8,7 @@ import { sendWhatsAppMessage } from '@/lib/whatsapp/provider';
 const LESSON_DATA = {
   topic: 'Kraft Singles: El Queso de Verdad',
   
-  // Mensaje con video
+  // Mensaje con video - YouTube se envía como link en el texto
   videoMessage: `🧀 *Kraft Singles: El Queso de Verdad*
 
 ¡Hola! 👋
@@ -17,9 +17,11 @@ Sabemos que las mamás buscan lo mejor para el lunch. Pero ojo: hay "quesos" que
 
 Kraft Singles es queso americano REAL, hecho con leche de vaca.
 
-👇 Mira este video corto:`,
+👇 Mira este video corto:
 
-  // URL del video - Video de YouTube
+https://youtu.be/8_xNUqWLrXs`,
+
+  // URL del video - YouTube (se incluye en el mensaje de texto, no como mediaUrl)
   videoUrl: 'https://youtu.be/8_xNUqWLrXs',
 
   // Mensaje del quiz (se envía después del video)
@@ -73,11 +75,12 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Demo Kraft] Enviando Demo Kraft a ${targetPhone} con Video: ${LESSON_DATA.videoUrl}`);
 
-    // 1. Enviar mensaje con video
+    // 1. Enviar mensaje con video (YouTube como link en el texto, WhatsApp mostrará preview)
     const videoResult = await sendWhatsAppMessage({
       to: targetPhone,
       body: LESSON_DATA.videoMessage,
-      mediaUrl: LESSON_DATA.videoUrl,
+      previewUrl: true, // Activa preview de YouTube en WhatsApp
+      // No usamos mediaUrl porque YouTube no es un archivo directo
     });
 
     if (!videoResult.success) {
